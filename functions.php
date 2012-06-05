@@ -7,21 +7,21 @@ add_action( 'init', 'create_event_postype' );
 function create_event_postype() {
 
 $labels = array(
-    'name' => _x('Events', 'post type general name'),
-    'singular_name' => _x('Event', 'post type singular name'),
-    'add_new' => _x('Add New', 'events'),
-    'add_new_item' => __('Add New Event'),
-    'edit_item' => __('Edit Event'),
-    'new_item' => __('New Event'),
-    'view_item' => __('View Event'),
-    'search_items' => __('Search Events'),
-    'not_found' =>  __('No events found'),
-    'not_found_in_trash' => __('No events found in Trash'),
+    'name' => _x('Agenda', 'post type general name'),
+    'singular_name' => _x('Agenda', 'post type singular name'),
+    'add_new' => _x('Add New', 'Agenda'),
+    'add_new_item' => __('Add New Agenda'),
+    'edit_item' => __('Edit Agenda'),
+    'new_item' => __('New Agenda'),
+    'view_item' => __('View Agenda'),
+    'search_items' => __('Search Agenda'),
+    'not_found' =>  __('No Agenda found'),
+    'not_found_in_trash' => __('No agenda found in Trash'),
     'parent_item_colon' => '',
 );
 
 $args = array(
-    'label' => __('Events'),
+    'label' => __('Agenda'),
     'labels' => $labels,
     'public' => true,
     'can_export' => true,
@@ -30,7 +30,7 @@ $args = array(
     'capability_type' => 'post',
     'menu_icon' => get_bloginfo('template_url').'/images/icon-datepicker.png',
     'hierarchical' => false,
-    'rewrite' => array( "slug" => "events" ),
+    'rewrite' => array( "slug" => "agenda" ),
     'supports'=> array('title', 'thumbnail', 'excerpt', 'editor') ,
     'show_in_nav_menus' => true,
     'taxonomies' => array( 'tf_eventcategory', 'post_tag')
@@ -43,33 +43,64 @@ register_post_type( 'tf_events', $args);
 function create_eventcategory_taxonomy() {
 
 $labels = array(
-    'name' => _x( 'Categories', 'taxonomy general name' ),
-    'singular_name' => _x( 'Category', 'taxonomy singular name' ),
-    'search_items' =>  __( 'Search Categories' ),
-    'popular_items' => __( 'Popular Categories' ),
-    'all_items' => __( 'All Categories' ),
+    'name' => _x( 'Locations', 'taxonomy general name' ),
+    'singular_name' => _x( 'Location', 'taxonomy singular name' ),
+    'search_items' =>  __( 'Search Locations' ),
+    'popular_items' => __( 'Popular Locations' ),
+    'all_items' => __( 'All Locations' ),
     'parent_item' => null,
     'parent_item_colon' => null,
-    'edit_item' => __( 'Edit Category' ),
-    'update_item' => __( 'Update Category' ),
-    'add_new_item' => __( 'Add New Category' ),
-    'new_item_name' => __( 'New Category Name' ),
-    'separate_items_with_commas' => __( 'Separate categories with commas' ),
-    'add_or_remove_items' => __( 'Add or remove categories' ),
-    'choose_from_most_used' => __( 'Choose from the most used categories' ),
+    'edit_item' => __( 'Edit Location' ),
+    'update_item' => __( 'Update Location' ),
+    'add_new_item' => __( 'Add Location' ),
+    'new_item_name' => __( 'New Location Name' ),
+    'separate_items_with_commas' => __( 'Separate locations with commas' ),
+    'add_or_remove_items' => __( 'Add or remove locations' ),
+    'choose_from_most_used' => __( 'Choose from the most used locations' ),
 );
 
 register_taxonomy('tf_eventcategory','tf_events', array(
-    'label' => __('Event Category'),
+    'label' => __('Agenda Location'),
     'labels' => $labels,
     'hierarchical' => true,
     'show_ui' => true,
     'query_var' => true,
-    'rewrite' => array( 'slug' => 'event-category' ),
+    'rewrite' => array( 'slug' => 'agenda-category' ),
 ));
 }
 
 add_action( 'init', 'create_eventcategory_taxonomy', 0 );
+
+function add_custom_taxonomies() { 
+// Add new "Locations" taxonomy to Agenda 
+register_taxonomy('tf_eventarea', 'tf_events', array( 
+    // Hierarchical taxonomy (like categories) 
+    'hierarchical' => true, 
+    // This array of options controls the labels displayed in the WordPress Admin UI 
+    'labels' => array( 
+    'name' => _x( 'Area', 'taxonomy general name' ), 
+    'singular_name' => _x( 'Area', 'taxonomy singular name' ), 
+    'search_items' => __( 'Search Area' ), 
+    'all_items' => __( 'All Area' ), 
+    'parent_item' => __( 'Parent Area' ), 
+    'parent_item_colon' => __( 'Parent Area:' ), 
+    'edit_item' => __( 'Edit Area' ), 
+    'update_item' => __( 'Update Area' ), 
+    'add_new_item' => __( 'Add New Area' ), 
+    'new_item_name' => __( 'New Area Name' ), 
+    'menu_name' => __( 'Area' ), ), 
+        // Control the slugs used for this taxonomy 
+        'rewrite' => array( 
+        'slug' => 'area', 
+        // This controls the base slug that will display before each term 
+        'with_front' => false, 
+        // Don't display the category base before "/locations/" 
+        'hierarchical' => true 
+        // This will allow URL's like "/locations/boston/cambridge/" 
+        ), 
+    )); 
+} 
+add_action( 'init', 'add_custom_taxonomies', 0 );
 
 // 3. Show Columns
 
@@ -80,7 +111,8 @@ function tf_events_edit_columns($columns) {
 
 $columns = array(
     "cb" => "<input type=\"checkbox\" />",
-    "tf_col_ev_cat" => "Category",
+    "tf_col_ev_cat" => "Location",
+    "tf_col_ev_area" => "Area",
     "tf_col_ev_date" => "Dates",
     "tf_col_ev_times" => "Times",
     "tf_col_ev_thumb" => "Thumbnail",
@@ -104,6 +136,18 @@ case "tf_col_ev_cat":
     foreach ($eventcats as $eventcat)
     array_push($eventcats_html, $eventcat->name);
     echo implode($eventcats_html, ", ");
+    } else {
+    _e('None', 'themeforce');;
+    }
+break;
+case "tf_col_ev_area":
+    // - show taxonomy terms -
+    $eventarea = get_the_terms($post->ID, "tf_eventarea");
+    $eventarea_html = array();
+    if ($eventarea) {
+    foreach ($eventarea as $eventar)
+    array_push($eventarea_html, $eventar->name);
+    echo implode($eventarea_html, ", ");
     } else {
     _e('None', 'themeforce');;
     }
@@ -241,19 +285,19 @@ function events_updated_messages( $messages ) {
 
   $messages['tf_events'] = array(
     0 => '', // Unused. Messages start at index 1.
-    1 => sprintf( __('Event updated. <a href="%s">View item</a>'), esc_url( get_permalink($post_ID) ) ),
+    1 => sprintf( __('Agenda updated. <a href="%s">View item</a>'), esc_url( get_permalink($post_ID) ) ),
     2 => __('Custom field updated.'),
     3 => __('Custom field deleted.'),
-    4 => __('Event updated.'),
+    4 => __('Agenda updated.'),
     /* translators: %s: date and time of the revision */
-    5 => isset($_GET['revision']) ? sprintf( __('Event restored to revision from %s'), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
-    6 => sprintf( __('Event published. <a href="%s">View event</a>'), esc_url( get_permalink($post_ID) ) ),
-    7 => __('Event saved.'),
-    8 => sprintf( __('Event submitted. <a target="_blank" href="%s">Preview event</a>'), esc_url( add_query_arg( 'preview', 'true', get_permalink($post_ID) ) ) ),
-    9 => sprintf( __('Event scheduled for: <strong>%1$s</strong>. <a target="_blank" href="%2$s">Preview event</a>'),
+    5 => isset($_GET['revision']) ? sprintf( __('Agenda restored to revision from %s'), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
+    6 => sprintf( __('Agenda published. <a href="%s">View agenda</a>'), esc_url( get_permalink($post_ID) ) ),
+    7 => __('Agenda saved.'),
+    8 => sprintf( __('Agenda submitted. <a target="_blank" href="%s">Preview agenda</a>'), esc_url( add_query_arg( 'preview', 'true', get_permalink($post_ID) ) ) ),
+    9 => sprintf( __('Agenda scheduled for: <strong>%1$s</strong>. <a target="_blank" href="%2$s">Preview agenda</a>'),
       // translators: Publish box date format, see http://php.net/date
       date_i18n( __( 'M j, Y @ G:i' ), strtotime( $post->post_date ) ), esc_url( get_permalink($post_ID) ) ),
-    10 => sprintf( __('Event draft updated. <a target="_blank" href="%s">Preview event</a>'), esc_url( add_query_arg( 'preview', 'true', get_permalink($post_ID) ) ) ),
+    10 => sprintf( __('Agenda draft updated. <a target="_blank" href="%s">Preview agenda</a>'), esc_url( add_query_arg( 'preview', 'true', get_permalink($post_ID) ) ) ),
   );
 
   return $messages;
@@ -275,6 +319,7 @@ function events_scripts() {
     wp_enqueue_script('ui-datepicker', get_bloginfo('template_url') . '/js/jquery.ui.datepicker.min.js');
     wp_enqueue_script('custom_script', get_bloginfo('template_url').'/js/pubforce-admin.js', array('jquery'));
 }
+
 
 
 /**
@@ -334,41 +379,6 @@ function getCatSearchFilter($pre,$post){
 
 }
 
-/* Adding Location Taxonomy Template for the theme */
-/* Resources: http://wp.smashingmagazine.com/2012/01/04/create-custom-taxonomies-wordpress/ */
-/** * Add custom taxonomies * * Additional custom taxonomies can be defined here * http://codex.wordpress.org/Function_Reference/register_taxonomy */ 
-function add_custom_taxonomies() { 
-// Add new "Locations" taxonomy to Posts 
-	register_taxonomy('location', 'post', array( 
-	// Hierarchical taxonomy (like categories) 
-	'hierarchical' => true, 
-	// This array of options controls the labels displayed in the WordPress Admin UI 
-	'labels' => array( 
-		'name' => _x( 'Locations', 'taxonomy general name' ), 
-		'singular_name' => _x( 'Location', 'taxonomy singular name' ), 
-		'search_items' => __( 'Search Locations' ), 
-		'all_items' => __( 'All Locations' ), 
-		'parent_item' => __( 'Parent Location' ), 
-		'parent_item_colon' => __( 'Parent Location:' ), 
-		'edit_item' => __( 'Edit Location' ), 
-		'update_item' => __( 'Update Location' ), 
-		'add_new_item' => __( 'Add New Location' ), 
-		'new_item_name' => __( 'New Location Name' ), 
-		'menu_name' => __( 'Locations' ), ), 
-
-	// Control the slugs used for this taxonomy 
-
-	'rewrite' => array( 'slug' => 'locations', 
-	// This controls the base slug that will display before each term 
-	'with_front' => false, 
-	// Don't display the category base before "/locations/" 
-	'hierarchical' => true 
-	// This will allow URL's like "/locations/boston/cambridge/" 
-	), 
-	)); 
-} 
-
-add_action( 'init', 'add_custom_taxonomies', 0 );
 
 /**
  * Set the content width based on the theme's design and stylesheet.

@@ -38,6 +38,7 @@ footer{ margin-top:1em; background-color:#000; }
 .nav-header ul li a:hover{ color:#EEE; text-shadow:0 1px 0 rgba(111, 111, 111, 0.5); }
 .nav-header ul li.current_page_item > a,
 .nav-header ul li.current-menu-ancestor > a,
+.nav-header ul li.current-post-ancestor > a,
 .nav-header ul li.current-menu-item > a,
 .nav-header ul li.current-menu-parent > a {
 	color:#EEE; text-shadow:0 1px 0 rgba(111, 111, 111, 0.5);
@@ -145,6 +146,8 @@ div.menu li {
 .index-post-content{ padding-top:2em; }
 .index-photo-post{ padding-top:1.5em; }
 .index-video-post{ padding-top:1em; }
+
+.event-location,.event-date{ font-size:1.2em; font-weight:bold; }
 
 ul.entry-meta{ list-style:none; margin-left:0px; margin-bottom:1.3em;}
 ul.entry-meta li{ float: left; margin:0px; }
@@ -358,7 +361,7 @@ img.aligncenter {
 	display: block;
 }
 #nav-below {
-	margin: -18px 0 0 0;
+	margin: 18px 0 0 0;
 }
 
 

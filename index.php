@@ -94,44 +94,48 @@
                 </div>
                 <div class="span3 index-agenda">
                     <h4 class="widget-title">AGENDA</h4>
-                    <?php 
-                                 query_posts('cat=4&posts_per_page=2');
-                                if(have_posts()) :
-                            ?>
-                             <?php while(have_posts()): the_post(); ?>
+                <?php
+              $args = array( 'post_type' => 'tf_events', 'posts_per_page' => 2 );
+$loop = new WP_Query( $args );
+while ( $loop->have_posts() ) : $loop->the_post();
+
+
+                // - custom variables -
+                $custom = get_post_custom(get_the_ID());
+                $sd = $custom["tf_events_startdate"][0];
+                $ed = $custom["tf_events_enddate"][0];
+
+                $longdate = date("F j, Y", $sd);
+                ?>
                              
                              <div class="row agenda-post">
                                 <div class="span1 columns">
-                                    <?php echo get_the_date(); ?>
+                                    <?php echo $longdate; ?>
                                 </div>
                                 <div class="span2 columns">
                                     <h3 class="agenda-title"><a href="<?php the_permalink(); ?>" title="<?php printf( esc_attr__( 'Permalink to %s', 'twentyten' ), the_title_attribute( 'echo=0' ) ); ?>" rel="bookmark"><?php the_title(); ?></a></h3>
-                                    <?php
-                                        $terms = get_the_terms( $post->ID, 'location' );
-                                                                
-                                        if ( $terms && ! is_wp_error( $terms ) ) : 
-
-                                            $draught_links = array();
-
-                                            foreach ( $terms as $term ) {
-                                                $draught_links[] = $term->name;
-                                            }
-                                                                
-                                            $on_draught = join( ", ", $draught_links );
-                                        ?>
+                                   
 
                                         <p class="agenda-location">
-                                            @<?php echo $on_draught; ?>
+                                           <?php
+                                           // - show taxonomy terms -
+    $eventcats = get_the_terms($post->ID, "tf_eventcategory");
+    $eventcats_html = array();
+    if ($eventcats) {
+    foreach ($eventcats as $eventcat)
+    array_push($eventcats_html, $eventcat->name);
+    echo implode($eventcats_html, ", ");
+    } else {
+    _e('None', 'themeforce');;
+    }
+                                            ?>
                                         </p>
 
-                                        <?php endif; ?>
+                                       
                                 </div>
                              </div>
                              <div class="clearfix"></div>
-                            
-                            <?php endwhile;?>
-                            <?php else:?>
-                            <?php endif; wp_reset_query();?>
+                          <?php endwhile; ?>    
                 </div>
             </div>
           </div> <!-- #Content -->
